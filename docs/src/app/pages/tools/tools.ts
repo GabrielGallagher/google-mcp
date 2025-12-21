@@ -29,22 +29,22 @@ interface Tool {
             {{ filteredTools().length }} tools available across all services
           </p>
         </div>
-        
+
         <!-- Search & Filter -->
         <div class="flex gap-4">
           <div class="google-search-box flex items-center px-4 py-2 bg-white w-64">
             <svg class="w-4 h-4 text-[var(--color-google-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
-            <input 
-              type="text" 
-              placeholder="Filter tools..." 
+            <input
+              type="text"
+              placeholder="Filter tools..."
               class="flex-1 bg-transparent border-none outline-none px-3 text-sm"
               [(ngModel)]="searchFilter"
             >
           </div>
-          
-          <select 
+
+          <select
             [(ngModel)]="serviceFilter"
             class="px-4 py-2 border border-[var(--color-google-gray-300)] rounded-md text-sm text-[var(--color-google-gray-700)] bg-white"
           >
@@ -121,7 +121,7 @@ export class Tools {
     { name: 'google_auth_status', description: 'Check current authentication status', service: 'Authentication', serviceIcon: '🔐' },
     { name: 'google_auth_code', description: 'Manually set authorization code', service: 'Authentication', serviceIcon: '🔐', parameters: ['code'] },
     { name: 'google_logout', description: 'Log out and clear stored tokens', service: 'Authentication', serviceIcon: '🔐' },
-    
+
     // Calendar
     { name: 'calendar_list', description: 'List all calendars', service: 'Calendar', serviceIcon: '📅' },
     { name: 'calendar_get', description: 'Get calendar details', service: 'Calendar', serviceIcon: '📅', parameters: ['calendarId'] },
@@ -261,7 +261,7 @@ export class Tools {
 
   protected filteredTools = computed(() => {
     let result = this.tools();
-    
+
     if (this.searchFilter) {
       const search = this.searchFilter.toLowerCase();
       result = result.filter(
@@ -270,11 +270,11 @@ export class Tools {
           t.description.toLowerCase().includes(search)
       );
     }
-    
+
     if (this.serviceFilter) {
       result = result.filter((t) => t.service === this.serviceFilter);
     }
-    
+
     return result;
   });
 }

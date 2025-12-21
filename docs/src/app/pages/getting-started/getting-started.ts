@@ -14,7 +14,7 @@ import { RouterLink } from '@angular/router';
       </nav>
 
       <h1 class="text-3xl font-normal text-[var(--color-google-gray-900)] mb-6">Getting Started</h1>
-      
+
       <p class="text-lg text-[var(--color-google-gray-600)] mb-12">
         Set up Google MCP to integrate Google Workspace services with your AI assistant in minutes.
       </p>
@@ -133,7 +133,7 @@ import { RouterLink } from '@angular/router';
           <div class="google-card p-6">
             <h3 class="font-medium text-[var(--color-google-gray-900)] mb-3">Place Credentials File</h3>
             <p class="text-[var(--color-google-gray-600)] mb-4">Save the downloaded JSON as <code class="bg-[var(--color-google-gray-100)] px-2 py-1 rounded text-sm">credentials.json</code>:</p>
-            
+
             <div class="space-y-3">
               <div class="flex items-center gap-3">
                 <span class="text-2xl">🐧</span>

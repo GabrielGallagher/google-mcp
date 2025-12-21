@@ -1,11 +1,18 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import {
+  faCalendarDays, faEnvelope, faFolder, faFileLines, faTableCells,
+  faDisplay, faVideo, faComments, faClipboardQuestion, faListCheck, faAddressBook, faSearch
+} from '@fortawesome/free-solid-svg-icons';
+import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 interface ServiceInfo {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon: IconDefinition;
   color: string;
   bgColor: string;
   fullDescription: string;
@@ -28,7 +35,7 @@ interface ExampleInfo {
 
 @Component({
   selector: 'app-service-detail',
-  imports: [RouterLink],
+  imports: [RouterLink, FontAwesomeModule],
   template: `
     @if (service()) {
       <div class="max-w-4xl mx-auto px-4 py-12">
@@ -43,11 +50,11 @@ interface ExampleInfo {
 
         <!-- Header -->
         <div class="flex items-start gap-6 mb-12">
-          <div 
+          <div
             class="w-20 h-20 rounded-2xl flex items-center justify-center flex-shrink-0"
             [style.background-color]="service()!.bgColor"
           >
-            <span class="text-4xl">{{ service()!.icon }}</span>
+            <fa-icon [icon]="service()!.icon" class="text-4xl" [style.color]="service()!.color"></fa-icon>
           </div>
           <div>
             <h1 class="text-3xl font-normal text-[var(--color-google-gray-900)] mb-2">{{ service()!.name }}</h1>
@@ -93,7 +100,7 @@ interface ExampleInfo {
                   </code>
                 </div>
                 <p class="text-[var(--color-google-gray-700)] mb-4">{{ tool.description }}</p>
-                
+
                 @if (tool.parameters && tool.parameters.length > 0) {
                   <div class="border-t border-[var(--color-google-gray-100)] pt-4">
                     <h4 class="text-sm font-medium text-[var(--color-google-gray-700)] mb-3">Parameters</h4>
@@ -164,7 +171,7 @@ interface ExampleInfo {
       </div>
     } @else {
       <div class="max-w-4xl mx-auto px-4 py-24 text-center">
-        <div class="text-6xl mb-4">🔍</div>
+        <fa-icon [icon]="faSearch" class="text-6xl text-[var(--color-google-gray-400)] mb-4"></fa-icon>
         <h2 class="text-xl font-medium text-[var(--color-google-gray-700)] mb-2">Service not found</h2>
         <p class="text-[var(--color-google-gray-500)] mb-6">The requested service doesn't exist.</p>
         <a routerLink="/services" class="google-btn google-btn-primary">View All Services</a>
@@ -174,6 +181,9 @@ interface ExampleInfo {
 })
 export class ServiceDetail implements OnInit {
   private route = inject(ActivatedRoute);
+
+  // Font Awesome icons
+  protected readonly faSearch = faSearch;
 
   protected serviceId = signal<string>('');
   protected service = computed(() => this.servicesData[this.serviceId()]);
@@ -189,7 +199,7 @@ export class ServiceDetail implements OnInit {
       id: 'calendar',
       name: 'Google Calendar',
       description: 'Manage events, meetings, and schedules',
-      icon: '📅',
+      icon: faCalendarDays,
       color: '#4285F4',
       bgColor: '#E8F0FE',
       fullDescription: 'Google Calendar integration allows you to create, read, update, and delete calendar events. You can manage multiple calendars, check availability with free/busy queries, and use natural language to quickly add events.',
@@ -244,7 +254,7 @@ export class ServiceDetail implements OnInit {
       id: 'gmail',
       name: 'Gmail',
       description: 'Read, send, and organize emails',
-      icon: '✉️',
+      icon: faEnvelope,
       color: '#EA4335',
       bgColor: '#FCE8E6',
       fullDescription: 'Gmail integration provides comprehensive email management including reading, sending, replying, searching, and organizing messages. You can work with threads, labels, and perform bulk operations.',
@@ -278,7 +288,7 @@ export class ServiceDetail implements OnInit {
       id: 'drive',
       name: 'Google Drive',
       description: 'Store, search, and manage files',
-      icon: '📁',
+      icon: faFolder,
       color: '#FBBC05',
       bgColor: '#FEF7E0',
       fullDescription: 'Google Drive integration enables file management operations including listing, uploading, downloading, searching, and organizing files. You can work with folders, share files, and export Google Workspace documents.',
@@ -313,7 +323,7 @@ export class ServiceDetail implements OnInit {
       id: 'docs',
       name: 'Google Docs',
       description: 'Create and edit documents',
-      icon: '📄',
+      icon: faFileLines,
       color: '#4285F4',
       bgColor: '#E8F0FE',
       fullDescription: 'Google Docs integration allows you to create, read, and modify documents. You can insert text, append content, and perform find-and-replace operations.',
@@ -348,7 +358,7 @@ export class ServiceDetail implements OnInit {
       id: 'sheets',
       name: 'Google Sheets',
       description: 'Work with spreadsheets and data',
-      icon: '📊',
+      icon: faTableCells,
       color: '#34A853',
       bgColor: '#E6F4EA',
       fullDescription: 'Google Sheets integration provides spreadsheet management including reading and writing cell values, managing sheets, and performing batch operations.',
@@ -384,7 +394,7 @@ export class ServiceDetail implements OnInit {
       id: 'slides',
       name: 'Google Slides',
       description: 'Build and modify presentations',
-      icon: '📽️',
+      icon: faDisplay,
       color: '#FBBC05',
       bgColor: '#FEF7E0',
       fullDescription: 'Google Slides integration allows you to create and modify presentations, add slides, insert text and images, and perform text replacements.',
@@ -414,7 +424,7 @@ export class ServiceDetail implements OnInit {
       id: 'meet',
       name: 'Google Meet',
       description: 'Schedule and manage video meetings',
-      icon: '🎥',
+      icon: faVideo,
       color: '#34A853',
       bgColor: '#E6F4EA',
       fullDescription: 'Google Meet integration enables you to create meeting spaces, schedule meetings through Calendar, manage participants, and access recordings and transcripts.',
@@ -440,7 +450,7 @@ export class ServiceDetail implements OnInit {
       id: 'chat',
       name: 'Google Chat',
       description: 'Send messages and manage spaces',
-      icon: '💬',
+      icon: faComments,
       color: '#34A853',
       bgColor: '#E6F4EA',
       fullDescription: 'Google Chat integration allows you to send and manage messages, create and manage spaces, handle members, and add reactions.',
@@ -469,7 +479,7 @@ export class ServiceDetail implements OnInit {
       id: 'forms',
       name: 'Google Forms',
       description: 'Create surveys and collect responses',
-      icon: '📝',
+      icon: faClipboardQuestion,
       color: '#673AB7',
       bgColor: '#EDE7F6',
       fullDescription: 'Google Forms integration enables you to create forms, add various question types, manage form structure, and retrieve responses.',
@@ -499,7 +509,7 @@ export class ServiceDetail implements OnInit {
       id: 'youtube',
       name: 'YouTube',
       description: 'Search videos and manage playlists',
-      icon: '▶️',
+      icon: faYoutube,
       color: '#FF0000',
       bgColor: '#FFEBEE',
       fullDescription: 'YouTube integration allows you to search for videos, channels, and playlists, manage your own playlists, view comments, and interact with content through likes.',
@@ -527,7 +537,7 @@ export class ServiceDetail implements OnInit {
       id: 'tasks',
       name: 'Google Tasks',
       description: 'Manage to-do lists and tasks',
-      icon: '✅',
+      icon: faListCheck,
       color: '#4285F4',
       bgColor: '#E8F0FE',
       fullDescription: 'Google Tasks integration provides task management including task lists, creating and completing tasks, and note-taking functionality similar to Google Keep.',
@@ -560,7 +570,7 @@ export class ServiceDetail implements OnInit {
       id: 'contacts',
       name: 'Google Contacts',
       description: 'Manage contacts and contact groups',
-      icon: '👥',
+      icon: faAddressBook,
       color: '#4285F4',
       bgColor: '#E8F0FE',
       fullDescription: 'Google Contacts (People API) integration allows you to list, search, create, and manage contacts and contact groups.',

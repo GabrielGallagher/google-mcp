@@ -1,6 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { 
+  faSearch, faMicrophone, faCheck, faLock, faCode, faDesktop,
+  faCalendarDays, faEnvelope, faFolder, faFileLines, faTableCells,
+  faDisplay, faVideo, faComments, faClipboardQuestion, faCirclePlay,
+  faListCheck, faAddressBook
+} from '@fortawesome/free-solid-svg-icons';
+import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 
 interface Service {
   id: string;
@@ -13,7 +21,7 @@ interface Service {
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, FontAwesomeModule],
   template: `
     <div class="flex flex-col items-center">
       <!-- Hero Section - Google Search Style -->
@@ -29,23 +37,19 @@ interface Service {
         <!-- Search Box -->
         <div class="w-full max-w-xl mb-8 animate-fade-in" style="animation-delay: 0.1s">
           <div class="google-search-box flex items-center px-4 py-3 bg-white">
-            <svg class="w-5 h-5 text-[var(--color-google-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            <input 
-              type="text" 
-              placeholder="Search documentation..." 
+            <fa-icon [icon]="faSearch" class="text-[var(--color-google-gray-500)]"></fa-icon>
+            <input
+              type="text"
+              placeholder="Search documentation..."
               class="flex-1 bg-transparent border-none outline-none px-4 text-base text-[var(--color-google-gray-900)]"
               [(ngModel)]="searchQuery"
               (keyup.enter)="onSearch()"
             >
-            <button 
+            <button
               class="p-2 hover:bg-[var(--color-google-gray-100)] rounded-full transition-colors"
               (click)="onSearch()"
             >
-              <svg class="w-5 h-5 text-[var(--color-google-blue)]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 15c1.66 0 2.99-1.34 2.99-3L15 6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 15 6.7 12H5c0 3.42 2.72 6.23 6 6.72V22h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
-              </svg>
+              <fa-icon [icon]="faMicrophone" class="text-[var(--color-google-blue)]"></fa-icon>
             </button>
           </div>
         </div>
@@ -90,16 +94,16 @@ interface Service {
         </h2>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           @for (service of services(); track service.id; let i = $index) {
-            <a 
-              [routerLink]="['/services', service.id]" 
+            <a
+              [routerLink]="['/services', service.id]"
               class="google-card p-6 flex flex-col items-center text-center cursor-pointer animate-fade-in"
               [style.animation-delay]="(0.4 + i * 0.05) + 's'"
             >
-              <div 
+              <div
                 class="w-14 h-14 rounded-full flex items-center justify-center mb-4"
                 [style.background-color]="service.bgColor"
               >
-                <span class="text-2xl" [innerHTML]="service.icon"></span>
+                <fa-icon [icon]="serviceIcons[service.id]" class="text-2xl" [style.color]="service.color"></fa-icon>
               </div>
               <h3 class="font-medium text-[var(--color-google-gray-900)] mb-1">{{ service.name }}</h3>
               <p class="text-xs text-[var(--color-google-gray-600)]">{{ service.description }}</p>
@@ -156,32 +160,24 @@ interface Service {
                 Model Context Protocol
               </h2>
               <p class="text-[var(--color-google-gray-600)] mb-6">
-                Google MCP provides a standardized way for AI assistants to interact with Google Workspace services. 
+                Google MCP provides a standardized way for AI assistants to interact with Google Workspace services.
                 Use natural language to manage your emails, calendar, documents, and more.
               </p>
               <ul class="space-y-3">
                 <li class="flex items-center gap-3 text-[var(--color-google-gray-700)]">
-                  <svg class="w-5 h-5 text-[var(--color-google-green)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
+                  <fa-icon [icon]="faLock" class="text-[var(--color-google-green)]"></fa-icon>
                   Secure OAuth 2.0 authentication
                 </li>
                 <li class="flex items-center gap-3 text-[var(--color-google-gray-700)]">
-                  <svg class="w-5 h-5 text-[var(--color-google-green)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
+                  <fa-icon [icon]="faCode" class="text-[var(--color-google-green)]"></fa-icon>
                   100+ tools across 12 services
                 </li>
                 <li class="flex items-center gap-3 text-[var(--color-google-gray-700)]">
-                  <svg class="w-5 h-5 text-[var(--color-google-green)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
+                  <fa-icon [icon]="faCheck" class="text-[var(--color-google-green)]"></fa-icon>
                   TypeScript with full type safety
                 </li>
                 <li class="flex items-center gap-3 text-[var(--color-google-gray-700)]">
-                  <svg class="w-5 h-5 text-[var(--color-google-green)]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
+                  <fa-icon [icon]="faDesktop" class="text-[var(--color-google-green)]"></fa-icon>
                   Cross-platform support (Linux, macOS, Windows)
                 </li>
               </ul>
@@ -216,19 +212,43 @@ interface Service {
 export class Home {
   protected searchQuery = '';
 
+  // Font Awesome icons
+  protected readonly faSearch = faSearch;
+  protected readonly faMicrophone = faMicrophone;
+  protected readonly faCheck = faCheck;
+  protected readonly faLock = faLock;
+  protected readonly faCode = faCode;
+  protected readonly faDesktop = faDesktop;
+
+  // Service icons mapping
+  protected readonly serviceIcons: Record<string, typeof faCalendarDays> = {
+    calendar: faCalendarDays,
+    gmail: faEnvelope,
+    drive: faFolder,
+    docs: faFileLines,
+    sheets: faTableCells,
+    slides: faDisplay,
+    meet: faVideo,
+    chat: faComments,
+    forms: faClipboardQuestion,
+    youtube: faYoutube,
+    tasks: faListCheck,
+    contacts: faAddressBook
+  };
+
   protected services = signal<Service[]>([
-    { id: 'calendar', name: 'Calendar', description: 'Events & scheduling', icon: '📅', color: '#4285F4', bgColor: '#E8F0FE' },
-    { id: 'gmail', name: 'Gmail', description: 'Email management', icon: '✉️', color: '#EA4335', bgColor: '#FCE8E6' },
-    { id: 'drive', name: 'Drive', description: 'File storage', icon: '📁', color: '#FBBC05', bgColor: '#FEF7E0' },
-    { id: 'docs', name: 'Docs', description: 'Documents', icon: '📄', color: '#4285F4', bgColor: '#E8F0FE' },
-    { id: 'sheets', name: 'Sheets', description: 'Spreadsheets', icon: '📊', color: '#34A853', bgColor: '#E6F4EA' },
-    { id: 'slides', name: 'Slides', description: 'Presentations', icon: '📽️', color: '#FBBC05', bgColor: '#FEF7E0' },
-    { id: 'meet', name: 'Meet', description: 'Video meetings', icon: '🎥', color: '#34A853', bgColor: '#E6F4EA' },
-    { id: 'chat', name: 'Chat', description: 'Team messaging', icon: '💬', color: '#34A853', bgColor: '#E6F4EA' },
-    { id: 'forms', name: 'Forms', description: 'Surveys & forms', icon: '📝', color: '#673AB7', bgColor: '#EDE7F6' },
-    { id: 'youtube', name: 'YouTube', description: 'Video platform', icon: '▶️', color: '#FF0000', bgColor: '#FFEBEE' },
-    { id: 'tasks', name: 'Tasks', description: 'To-do lists', icon: '✅', color: '#4285F4', bgColor: '#E8F0FE' },
-    { id: 'contacts', name: 'Contacts', description: 'People & contacts', icon: '👥', color: '#4285F4', bgColor: '#E8F0FE' },
+    { id: 'calendar', name: 'Calendar', description: 'Events & scheduling', icon: 'calendar', color: '#4285F4', bgColor: '#E8F0FE' },
+    { id: 'gmail', name: 'Gmail', description: 'Email management', icon: 'gmail', color: '#EA4335', bgColor: '#FCE8E6' },
+    { id: 'drive', name: 'Drive', description: 'File storage', icon: 'drive', color: '#FBBC05', bgColor: '#FEF7E0' },
+    { id: 'docs', name: 'Docs', description: 'Documents', icon: 'docs', color: '#4285F4', bgColor: '#E8F0FE' },
+    { id: 'sheets', name: 'Sheets', description: 'Spreadsheets', icon: 'sheets', color: '#34A853', bgColor: '#E6F4EA' },
+    { id: 'slides', name: 'Slides', description: 'Presentations', icon: 'slides', color: '#FBBC05', bgColor: '#FEF7E0' },
+    { id: 'meet', name: 'Meet', description: 'Video meetings', icon: 'meet', color: '#34A853', bgColor: '#E6F4EA' },
+    { id: 'chat', name: 'Chat', description: 'Team messaging', icon: 'chat', color: '#34A853', bgColor: '#E6F4EA' },
+    { id: 'forms', name: 'Forms', description: 'Surveys & forms', icon: 'forms', color: '#673AB7', bgColor: '#EDE7F6' },
+    { id: 'youtube', name: 'YouTube', description: 'Video platform', icon: 'youtube', color: '#FF0000', bgColor: '#FFEBEE' },
+    { id: 'tasks', name: 'Tasks', description: 'To-do lists', icon: 'tasks', color: '#4285F4', bgColor: '#E8F0FE' },
+    { id: 'contacts', name: 'Contacts', description: 'People & contacts', icon: 'contacts', color: '#4285F4', bgColor: '#E8F0FE' },
   ]);
 
   constructor(private router: Router) {}

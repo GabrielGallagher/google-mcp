@@ -4,13 +4,13 @@
 /* Google-inspired theme */
 @theme {
   --font-family-google: 'Google Sans', 'Product Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  
+
   /* Google Brand Colors */
   --color-google-blue: #4285F4;
   --color-google-red: #EA4335;
   --color-google-yellow: #FBBC05;
   --color-google-green: #34A853;
-  
+
   /* Extended palette */
   --color-google-blue-light: #E8F0FE;
   --color-google-blue-dark: #1A73E8;

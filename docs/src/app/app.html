@@ -17,12 +17,10 @@
         @if (!isHomePage()) {
           <div class="hidden md:flex flex-1 max-w-xl mx-8">
             <div class="google-search-box flex items-center w-full px-4 py-2 bg-[var(--color-google-gray-50)]">
-              <svg class="w-5 h-5 text-[var(--color-google-gray-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-              <input 
-                type="text" 
-                placeholder="Search documentation..." 
+              <fa-icon [icon]="faSearch" class="text-[var(--color-google-gray-500)]"></fa-icon>
+              <input
+                type="text"
+                placeholder="Search documentation..."
                 class="flex-1 bg-transparent border-none outline-none px-3 text-sm text-[var(--color-google-gray-900)]"
                 [(ngModel)]="searchQuery"
                 (keyup.enter)="onSearch()"
@@ -33,44 +31,43 @@
 
         <!-- Navigation -->
         <nav class="hidden md:flex items-center gap-1">
-          <a 
-            routerLink="/getting-started" 
+          <a
+            routerLink="/getting-started"
             routerLinkActive="nav-item-active"
             class="px-4 py-2 text-sm font-medium text-[var(--color-google-gray-700)] hover:text-[var(--color-google-blue)] transition-colors"
           >
             Getting Started
           </a>
-          <a 
-            routerLink="/services" 
+          <a
+            routerLink="/services"
             routerLinkActive="nav-item-active"
             class="px-4 py-2 text-sm font-medium text-[var(--color-google-gray-700)] hover:text-[var(--color-google-blue)] transition-colors"
           >
             Services
           </a>
-          <a 
-            routerLink="/tools" 
+          <a
+            routerLink="/tools"
             routerLinkActive="nav-item-active"
             class="px-4 py-2 text-sm font-medium text-[var(--color-google-gray-700)] hover:text-[var(--color-google-blue)] transition-colors"
           >
             Tools
           </a>
-          <a 
-            href="https://github.com/pegasusheavy/google-mcp" 
+          <a
+            href="https://github.com/pegasusheavy/google-mcp"
             target="_blank"
-            class="ml-4 px-4 py-2 text-sm font-medium text-white bg-[var(--color-google-blue)] rounded-md hover:bg-[var(--color-google-blue-dark)] transition-colors"
+            class="ml-4 px-4 py-2 text-sm font-medium text-white bg-[var(--color-google-blue)] rounded-md hover:bg-[var(--color-google-blue-dark)] transition-colors flex items-center gap-2"
           >
+            <fa-icon [icon]="faGithub"></fa-icon>
             GitHub
           </a>
         </nav>
 
         <!-- Mobile menu button -->
-        <button 
+        <button
           class="md:hidden p-2 rounded-md text-[var(--color-google-gray-700)] hover:bg-[var(--color-google-gray-100)]"
           (click)="toggleMobileMenu()"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
+          <fa-icon [icon]="mobileMenuOpen() ? faXmark : faBars" class="text-xl"></fa-icon>
         </button>
       </div>
     </div>
@@ -79,33 +76,35 @@
     @if (mobileMenuOpen()) {
       <div class="md:hidden border-t border-[var(--color-google-gray-200)] bg-white animate-fade-in">
         <div class="px-4 py-3 space-y-2">
-          <a 
-            routerLink="/getting-started" 
+          <a
+            routerLink="/getting-started"
             class="block px-4 py-2 text-sm text-[var(--color-google-gray-700)] hover:bg-[var(--color-google-gray-100)] rounded-md"
             (click)="toggleMobileMenu()"
           >
             Getting Started
           </a>
-          <a 
-            routerLink="/services" 
+          <a
+            routerLink="/services"
             class="block px-4 py-2 text-sm text-[var(--color-google-gray-700)] hover:bg-[var(--color-google-gray-100)] rounded-md"
             (click)="toggleMobileMenu()"
           >
             Services
           </a>
-          <a 
-            routerLink="/tools" 
+          <a
+            routerLink="/tools"
             class="block px-4 py-2 text-sm text-[var(--color-google-gray-700)] hover:bg-[var(--color-google-gray-100)] rounded-md"
             (click)="toggleMobileMenu()"
           >
             Tools
           </a>
-          <a 
-            href="https://github.com/pegasusheavy/google-mcp" 
+          <a
+            href="https://github.com/pegasusheavy/google-mcp"
             target="_blank"
-            class="block px-4 py-2 text-sm text-[var(--color-google-blue)] font-medium"
+            class="flex items-center gap-2 px-4 py-2 text-sm text-[var(--color-google-blue)] font-medium"
           >
-            GitHub →
+            <fa-icon [icon]="faGithub"></fa-icon>
+            GitHub
+            <fa-icon [icon]="faArrowRight" class="text-xs"></fa-icon>
           </a>
         </div>
       </div>
@@ -125,7 +124,8 @@
           © 2024 Pegasus Heavy Industries. Licensed under MIT.
         </div>
         <div class="flex items-center gap-6 text-sm text-[var(--color-google-gray-600)]">
-          <a href="https://github.com/pegasusheavy/google-mcp" target="_blank" class="hover:text-[var(--color-google-blue)] transition-colors">
+          <a href="https://github.com/pegasusheavy/google-mcp" target="_blank" class="hover:text-[var(--color-google-blue)] transition-colors flex items-center gap-1">
+            <fa-icon [icon]="faGithub"></fa-icon>
             GitHub
           </a>
           <a href="https://github.com/pegasusheavy/google-mcp/issues" target="_blank" class="hover:text-[var(--color-google-blue)] transition-colors">
