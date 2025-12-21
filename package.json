@@ -1,5 +1,5 @@
 {
-  "name": "google-mcp",
+  "name": "@pegasusheavy/google-mcp",
   "version": "1.0.0",
   "description": "MCP server for Google Docs, Sheets, Keep, and Drive with OAuth authentication",
   "main": "dist/index.js",
