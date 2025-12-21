@@ -992,7 +992,7 @@ export class GoogleWorkspaceMCPServer {
                 },
                 startDateTime: {
                   type: "string",
-                  description: "Start time (ISO 8601 format, e.g., '2024-12-25T10:00:00-05:00')",
+                  description: "Start time (ISO 8601 format, e.g., '2025-01-15T10:00:00-05:00')",
                 },
                 endDateTime: {
                   type: "string",

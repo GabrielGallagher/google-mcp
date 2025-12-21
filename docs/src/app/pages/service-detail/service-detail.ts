@@ -245,7 +245,7 @@ export class ServiceDetail implements OnInit {
         ]}
       ],
       examples: [
-        { title: 'Schedule a meeting', description: 'Create a team meeting with attendees', code: 'Use calendar_create_event with summary "Team Meeting", start "2024-12-25T10:00:00-05:00", end "2024-12-25T11:00:00-05:00", attendees ["alice@example.com", "bob@example.com"]' },
+        { title: 'Schedule a meeting', description: 'Create a team meeting with attendees', code: 'Use calendar_create_event with summary "Team Meeting", start "2025-01-15T10:00:00-05:00", end "2025-01-15T11:00:00-05:00", attendees ["alice@example.com", "bob@example.com"]' },
         { title: 'Quick add event', description: 'Add event using natural language', code: 'Use calendar_quick_add with text "Lunch with John tomorrow at noon at Cafe Blue"' },
         { title: "Get today's schedule", description: "See all events for today", code: 'Use calendar_today' }
       ]
@@ -443,7 +443,7 @@ export class ServiceDetail implements OnInit {
         { name: 'meet_list_transcripts', description: 'List transcripts', parameters: [{ name: 'conferenceRecordName', type: 'string', required: true, description: 'Conference record name' }] }
       ],
       examples: [
-        { title: 'Schedule a meeting', description: 'Schedule a team call', code: 'Use meet_schedule with summary "Team Standup", startTime "2024-12-25T09:00:00-05:00", endTime "2024-12-25T09:30:00-05:00"' }
+        { title: 'Schedule a meeting', description: 'Schedule a team call', code: 'Use meet_schedule with summary "Team Standup", startTime "2025-01-15T09:00:00-05:00", endTime "2025-01-15T09:30:00-05:00"' }
       ]
     },
     chat: {

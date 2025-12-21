@@ -403,7 +403,7 @@ Use gmail_send with to "recipient@example.com", subject "Hello", and body "This 
 
 ### Create a Calendar Event
 ```
-Use calendar_create_event with summary "Team Meeting", startDateTime "2024-12-25T10:00:00-05:00", and endDateTime "2024-12-25T11:00:00-05:00"
+Use calendar_create_event with summary "Team Meeting", startDateTime "2025-01-15T10:00:00-05:00", and endDateTime "2025-01-15T11:00:00-05:00"
 ```
 
 ### Search YouTube
@@ -443,7 +443,7 @@ Use chat_send_message with spaceName "spaces/AAAAA" and text "Hello team!"
 
 ### Schedule a Google Meet
 ```
-Use meet_schedule with summary "Team Standup", startTime "2024-12-25T09:00:00-05:00", and endTime "2024-12-25T09:30:00-05:00"
+Use meet_schedule with summary "Team Standup", startTime "2025-01-15T09:00:00-05:00", and endTime "2025-01-15T09:30:00-05:00"
 ```
 
 ## Development
