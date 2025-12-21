@@ -12,6 +12,8 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix"
   },
@@ -35,12 +37,13 @@
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^4.0.16",
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.50.0",
-    "vitest": "^2.1.8"
+    "vitest": "^4.0.16"
   },
   "engines": {
     "node": ">=18.0.0"

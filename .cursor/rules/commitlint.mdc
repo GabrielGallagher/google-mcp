@@ -47,7 +47,7 @@ All commit messages must follow the [Conventional Commits](https://www.conventio
 ## Allowed Scopes (Project-Specific)
 
 ```
-auth, drive, docs, sheets, calendar, gmail, 
+auth, drive, docs, sheets, calendar, gmail,
 contacts, youtube, slides, tasks, server, types, deps
 ```
 
