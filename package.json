@@ -7,6 +7,23 @@
   "bin": {
     "google-mcp": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pegasusheavy/google-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pegasusheavy/google-mcp/issues"
+  },
+  "homepage": "https://github.com/pegasusheavy/google-mcp#readme",
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",

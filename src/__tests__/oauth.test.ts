@@ -98,10 +98,10 @@ describe("GoogleOAuth", () => {
       vi.resetModules();
       const { GoogleOAuth } = await import("../auth/oauth.js");
       const oauth = new GoogleOAuth();
-      
+
       vi.mocked(fs.mkdirSync).mockClear();
       oauth.ensureDirectoriesExist();
-      
+
       // Already initialized in constructor, should not create again
       expect(fs.mkdirSync).not.toHaveBeenCalled();
     });
@@ -114,7 +114,7 @@ describe("GoogleOAuth", () => {
 
       vi.resetModules();
       const { GoogleOAuth } = await import("../auth/oauth.js");
-      
+
       expect(() => new GoogleOAuth()).not.toThrow();
     });
   });
