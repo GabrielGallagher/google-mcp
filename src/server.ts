@@ -6,7 +6,7 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { oauth } from "./auth/oauth.js";
+import { oauth, GoogleOAuth } from "./auth/oauth.js";
 import { DriveService } from "./services/drive.js";
 import { DocsService } from "./services/docs.js";
 import { SheetsService } from "./services/sheets.js";
@@ -3294,10 +3294,24 @@ export class GoogleWorkspaceMCPServer {
   }
 
   async run(): Promise<void> {
+    // Ensure directories exist on startup
+    oauth.ensureDirectoriesExist();
+    
+    // Log configuration paths for user reference
+    const paths = GoogleOAuth.getPaths();
+    console.error("Google MCP Server starting...");
+    console.error(`  Config directory: ${paths.configDir}`);
+    console.error(`  Data directory: ${paths.dataDir}`);
+    console.error(`  Credentials file: ${paths.credentialsPath}`);
+    console.error(`  Token file: ${paths.tokenPath}`);
+    
     // Try to initialize OAuth on startup
     await oauth.initialize();
     if (oauth.isReady()) {
       this.initializeServices();
+      console.error("  Authentication: Ready");
+    } else {
+      console.error("  Authentication: Not configured (run google_auth tool)");
     }
 
     const transport = new StdioServerTransport();

@@ -29,13 +29,13 @@ const SCOPES = [
  */
 function getConfigDir(): string {
   const platform = os.platform();
-  
+
   if (platform === "win32") {
     // Windows: Use APPDATA
     const appData = process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming");
     return path.join(appData, APP_NAME);
   }
-  
+
   if (platform === "darwin") {
     // macOS: Prefer XDG if set, otherwise use Application Support
     if (process.env.XDG_CONFIG_HOME) {
@@ -43,7 +43,7 @@ function getConfigDir(): string {
     }
     return path.join(os.homedir(), "Library", "Application Support", APP_NAME);
   }
-  
+
   // Linux and others: Use XDG_CONFIG_HOME or default to ~/.config
   const xdgConfig = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
   return path.join(xdgConfig, APP_NAME);
@@ -57,13 +57,13 @@ function getConfigDir(): string {
  */
 function getDataDir(): string {
   const platform = os.platform();
-  
+
   if (platform === "win32") {
     // Windows: Use APPDATA (same as config for simplicity)
     const appData = process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming");
     return path.join(appData, APP_NAME);
   }
-  
+
   if (platform === "darwin") {
     // macOS: Prefer XDG if set, otherwise use Application Support
     if (process.env.XDG_DATA_HOME) {
@@ -71,7 +71,7 @@ function getDataDir(): string {
     }
     return path.join(os.homedir(), "Library", "Application Support", APP_NAME);
   }
-  
+
   // Linux and others: Use XDG_DATA_HOME or default to ~/.local/share
   const xdgData = process.env.XDG_DATA_HOME || path.join(os.homedir(), ".local", "share");
   return path.join(xdgData, APP_NAME);
@@ -99,23 +99,55 @@ interface CredentialsFile {
 export class GoogleOAuth {
   private oauth2Client: Auth.OAuth2Client | null = null;
   private isAuthenticated = false;
+  private directoriesInitialized = false;
 
   constructor() {
     this.ensureDirectoriesExist();
   }
 
-  private ensureDirectoriesExist(): void {
-    // Ensure config directory exists
-    const configDir = path.dirname(CREDENTIALS_PATH);
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
+  /**
+   * Ensures all required directories exist.
+   * Creates them with appropriate permissions if they don't exist.
+   * Safe to call multiple times.
+   */
+  ensureDirectoriesExist(): void {
+    if (this.directoriesInitialized) {
+      return;
     }
-    
-    // Ensure data directory exists
-    const dataDir = path.dirname(TOKEN_PATH);
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
+
+    try {
+      // Ensure config directory exists (for credentials.json)
+      const configDir = getConfigDir();
+      if (!fs.existsSync(configDir)) {
+        fs.mkdirSync(configDir, { recursive: true, mode: 0o700 });
+        console.error(`Created config directory: ${configDir}`);
+      }
+
+      // Ensure data directory exists (for tokens.json)
+      const dataDir = getDataDir();
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true, mode: 0o700 });
+        console.error(`Created data directory: ${dataDir}`);
+      }
+
+      this.directoriesInitialized = true;
+    } catch (error) {
+      console.error("Error creating directories:", error);
+      // Don't throw - the app should still try to run
     }
+  }
+
+  /**
+   * Get the paths where credentials and tokens should be stored.
+   * Useful for displaying to users where to place their files.
+   */
+  static getPaths(): { configDir: string; dataDir: string; credentialsPath: string; tokenPath: string } {
+    return {
+      configDir: getConfigDir(),
+      dataDir: getDataDir(),
+      credentialsPath: CREDENTIALS_PATH,
+      tokenPath: TOKEN_PATH,
+    };
   }
 
   private loadCredentials(): CredentialsFile | null {
@@ -131,7 +163,9 @@ export class GoogleOAuth {
   }
 
   private saveTokens(tokens: Auth.Credentials): void {
-    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens, null, 2));
+    // Ensure directory exists before saving
+    this.ensureDirectoriesExist();
+    fs.writeFileSync(TOKEN_PATH, JSON.stringify(tokens, null, 2), { mode: 0o600 });
   }
 
   private loadTokens(): Auth.Credentials | null {
