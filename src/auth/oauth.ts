@@ -2,11 +2,55 @@ import { google, type Auth } from "googleapis";
 import * as fs from "fs";
 import * as path from "path";
 import * as http from "http";
+import * as net from "net";
 import * as os from "os";
 import { URL } from "url";
 import open from "open";
 
 const APP_NAME = "google-mcp";
+
+// Port range for OAuth callback server
+const PORT_RANGE_START = 3000;
+const PORT_RANGE_END = 3100;
+
+/**
+ * Find an available port in the specified range.
+ * @param startPort - Start of the port range (inclusive)
+ * @param endPort - End of the port range (inclusive)
+ * @returns Promise resolving to an available port number
+ */
+async function findAvailablePort(startPort: number = PORT_RANGE_START, endPort: number = PORT_RANGE_END): Promise<number> {
+  for (let port = startPort; port <= endPort; port++) {
+    const available = await isPortAvailable(port);
+    if (available) {
+      return port;
+    }
+  }
+  throw new Error(`No available ports found in range ${startPort}-${endPort}`);
+}
+
+/**
+ * Check if a specific port is available.
+ * @param port - Port number to check
+ * @returns Promise resolving to true if port is available
+ */
+function isPortAvailable(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    
+    server.once("error", () => {
+      resolve(false);
+    });
+    
+    server.once("listening", () => {
+      server.close(() => {
+        resolve(true);
+      });
+    });
+    
+    server.listen(port, "127.0.0.1");
+  });
+}
 
 const SCOPES = [
   // Google Workspace core
@@ -278,6 +322,29 @@ export class GoogleOAuth {
       return true;
     }
 
+    // Find an available port for the OAuth callback server
+    let port: number;
+    try {
+      port = await findAvailablePort();
+      console.error(`Found available port: ${port}`);
+    } catch (error) {
+      console.error("Failed to find available port for OAuth callback:", error);
+      return false;
+    }
+
+    const redirectUri = `http://localhost:${port}/oauth2callback`;
+
+    // Update the OAuth2Client redirect URI for this authentication attempt
+    // This is needed because the redirect_uri in the auth URL must match
+    // Note: For "Desktop app" OAuth clients, Google allows any localhost port
+    const credentials = this.loadCredentials();
+    if (credentials) {
+      const { client_id, client_secret } = credentials.installed || credentials.web || {};
+      if (client_id && client_secret) {
+        this.oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirectUri);
+      }
+    }
+
     return new Promise((resolve) => {
       const authUrl = this.oauth2Client!.generateAuthUrl({
         access_type: "offline",
@@ -288,7 +355,7 @@ export class GoogleOAuth {
       // Create a temporary server to handle the OAuth callback
       const server = http.createServer(async (req, res) => {
         try {
-          const url = new URL(req.url!, `http://localhost:3000`);
+          const url = new URL(req.url!, `http://localhost:${port}`);
 
           if (url.pathname === "/oauth2callback") {
             const code = url.searchParams.get("code");
@@ -329,15 +396,23 @@ export class GoogleOAuth {
         }
       });
 
-      server.listen(3000, () => {
+      server.listen(port, "127.0.0.1", () => {
+        console.error(`OAuth callback server listening on port ${port}`);
         console.error("Opening browser for authentication...");
         console.error(`If browser doesn't open, visit: ${authUrl}`);
         void open(authUrl);
       });
 
+      // Handle server errors (e.g., port suddenly becomes unavailable)
+      server.on("error", (error) => {
+        console.error("OAuth server error:", error);
+        resolve(false);
+      });
+
       // Timeout after 5 minutes
       setTimeout(() => {
         if (!this.isAuthenticated) {
+          console.error("Authentication timeout - closing OAuth server");
           server.close();
           resolve(false);
         }
