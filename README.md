@@ -36,6 +36,7 @@ A comprehensive Model Context Protocol (MCP) server for Google integration, prov
 ### Google Gmail
 - Read, search, and list emails
 - Send emails and reply to threads
+- Create and list drafts
 - Mark as read/unread, trash messages
 - List labels and organize emails
 
@@ -100,6 +101,21 @@ pnpm install
 # Build the project
 pnpm build
 ```
+
+## Configuration
+
+By default, the server enables Gmail, Calendar, Drive, Docs, Sheets, and Slides.
+You can change enabled services and permissions using environment variables:
+
+- `GOOGLE_MCP_SERVICES`: Comma/space-separated list (e.g., `gmail,calendar,drive`). Use `all` to enable everything.
+- `GOOGLE_MCP_SCOPE_PROFILE`: `readonly`, `editor`, or `full` (default: `editor`).
+- `GOOGLE_MCP_SCOPES`: Override scopes completely (comma/space-separated).
+- `GOOGLE_MCP_GMAIL_COMPOSE`: Allow draft creation (default: true unless `readonly`).
+- `GOOGLE_MCP_GMAIL_MODIFY`: Allow label/mark actions (default: true unless `readonly`).
+- `GOOGLE_MCP_GMAIL_SEND`: Allow send/reply (default: true only for `full` profile).
+- `GOOGLE_MCP_CALENDAR_WRITE`: Allow create/update/delete calendar events (default: true only for `full` profile).
+
+When you change scopes, re-run `google_auth` (or `google_auth_code`) so the OAuth token matches the new scope set.
 
 ## Google Cloud Setup
 

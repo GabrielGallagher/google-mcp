@@ -6,6 +6,7 @@ import * as net from "net";
 import * as os from "os";
 import { URL } from "url";
 import open from "open";
+import { getScopes } from "../config.js";
 
 const APP_NAME = "google-mcp";
 
@@ -52,32 +53,7 @@ function isPortAvailable(port: number): Promise<boolean> {
   });
 }
 
-const SCOPES = [
-  // Google Workspace core
-  "https://www.googleapis.com/auth/documents",
-  "https://www.googleapis.com/auth/spreadsheets",
-  "https://www.googleapis.com/auth/drive",
-  "https://www.googleapis.com/auth/tasks",
-  "https://www.googleapis.com/auth/calendar",
-  "https://www.googleapis.com/auth/gmail.modify",
-  "https://www.googleapis.com/auth/gmail.send",
-  "https://www.googleapis.com/auth/contacts",
-  "https://www.googleapis.com/auth/presentations",
-  // YouTube
-  "https://www.googleapis.com/auth/youtube",
-  // Google Forms
-  "https://www.googleapis.com/auth/forms.body",
-  "https://www.googleapis.com/auth/forms.responses.readonly",
-  // Google Chat
-  "https://www.googleapis.com/auth/chat.spaces",
-  "https://www.googleapis.com/auth/chat.spaces.create",
-  "https://www.googleapis.com/auth/chat.messages",
-  "https://www.googleapis.com/auth/chat.messages.create",
-  "https://www.googleapis.com/auth/chat.memberships",
-  // Google Meet
-  "https://www.googleapis.com/auth/meetings.space.created",
-  "https://www.googleapis.com/auth/meetings.space.readonly",
-];
+const SCOPES = getScopes();
 
 /**
  * Get the configuration directory following platform standards:

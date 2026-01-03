@@ -11,6 +11,7 @@ export interface GmailMessage {
   date?: string;
   body?: string;
   isUnread?: boolean;
+  draftId?: string;
 }
 
 export interface GmailLabel {
@@ -44,6 +45,35 @@ export class GmailService {
 
   constructor(authClient: Auth.OAuth2Client) {
     this.gmail = google.gmail({ version: "v1", auth: authClient });
+  }
+
+  private buildRawMessage(options: SendEmailOptions): string {
+    const messageParts = [
+      `To: ${options.to}`,
+      `Subject: ${options.subject}`,
+    ];
+
+    if (options.cc) {
+      messageParts.push(`Cc: ${options.cc}`);
+    }
+    if (options.bcc) {
+      messageParts.push(`Bcc: ${options.bcc}`);
+    }
+
+    if (options.isHtml) {
+      messageParts.push("Content-Type: text/html; charset=utf-8");
+    } else {
+      messageParts.push("Content-Type: text/plain; charset=utf-8");
+    }
+
+    messageParts.push("");
+    messageParts.push(options.body);
+
+    return Buffer.from(messageParts.join("\r\n"))
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
   }
 
   // Profile
@@ -162,32 +192,7 @@ export class GmailService {
   }
 
   public async sendEmail(options: SendEmailOptions): Promise<GmailMessage> {
-    const messageParts = [
-      `To: ${options.to}`,
-      `Subject: ${options.subject}`,
-    ];
-
-    if (options.cc) {
-      messageParts.push(`Cc: ${options.cc}`);
-    }
-    if (options.bcc) {
-      messageParts.push(`Bcc: ${options.bcc}`);
-    }
-
-    if (options.isHtml) {
-      messageParts.push("Content-Type: text/html; charset=utf-8");
-    } else {
-      messageParts.push("Content-Type: text/plain; charset=utf-8");
-    }
-
-    messageParts.push("");
-    messageParts.push(options.body);
-
-    const rawMessage = Buffer.from(messageParts.join("\r\n"))
-      .toString("base64")
-      .replace(/\+/g, "-")
-      .replace(/\//g, "_")
-      .replace(/=+$/, "");
+    const rawMessage = this.buildRawMessage(options);
 
     const requestBody: gmail_v1.Schema$Message = {
       raw: rawMessage,
@@ -386,6 +391,65 @@ export class GmailService {
 
   public async getImportantEmails(maxResults = 20): Promise<GmailMessage[]> {
     return this.searchEmails("is:important", maxResults);
+  }
+
+  public async listDrafts(options: {
+    maxResults?: number;
+    pageToken?: string;
+    q?: string;
+  } = {}): Promise<{ drafts: GmailMessage[]; nextPageToken?: string }> {
+    const response = await this.gmail.users.drafts.list({
+      userId: "me",
+      maxResults: options.maxResults || 20,
+      pageToken: options.pageToken,
+      q: options.q,
+    });
+
+    const drafts: GmailMessage[] = [];
+    for (const draft of response.data.drafts || []) {
+      if (draft.message?.id) {
+        const message = await this.getMessage(draft.message.id);
+        message.draftId = draft.id || undefined;
+        drafts.push(message);
+      }
+    }
+
+    return {
+      drafts,
+      nextPageToken: response.data.nextPageToken || undefined,
+    };
+  }
+
+  public async createDraft(options: SendEmailOptions): Promise<{
+    draftId: string;
+    message: GmailMessage;
+  }> {
+    const rawMessage = this.buildRawMessage(options);
+
+    const requestBody: gmail_v1.Schema$Draft = {
+      message: {
+        raw: rawMessage,
+      },
+    };
+
+    if (options.threadId) {
+      requestBody.message!.threadId = options.threadId;
+    }
+
+    const response = await this.gmail.users.drafts.create({
+      userId: "me",
+      requestBody,
+    });
+
+    const draftId = response.data.id || "";
+    const messageId = response.data.message?.id;
+    const message = messageId ? await this.getMessage(messageId) : {
+      id: "",
+      threadId: response.data.message?.threadId || "",
+    };
+    message.draftId = draftId || undefined;
+
+    return { draftId, message };
   }
 }
 

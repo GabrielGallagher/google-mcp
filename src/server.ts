@@ -19,6 +19,7 @@ import { SlidesService } from "./services/slides.js";
 import { FormsService } from "./services/forms.js";
 import { ChatService } from "./services/chat.js";
 import { MeetService } from "./services/meet.js";
+import { getEnabledServices, isToolEnabled } from "./config.js";
 import {
   DriveListOptionsSchema,
   DocCreateOptionsSchema,
@@ -41,6 +42,7 @@ import {
 
 export class GoogleWorkspaceMCPServer {
   private readonly server: Server;
+  private readonly enabledServices: Set<string>;
   private drive: DriveService | null = null;
   private docs: DocsService | null = null;
   private sheets: SheetsService | null = null;
@@ -67,6 +69,7 @@ export class GoogleWorkspaceMCPServer {
         },
       }
     );
+    this.enabledServices = getEnabledServices();
 
     this.setupHandlers();
   }
@@ -74,18 +77,42 @@ export class GoogleWorkspaceMCPServer {
   private initializeServices(): void {
     const client = oauth.getClient();
     if (client) {
-      this.drive = new DriveService(client);
-      this.docs = new DocsService(client);
-      this.sheets = new SheetsService(client);
-      this.tasks = new TasksService(client);
-      this.calendar = new CalendarService(client);
-      this.gmail = new GmailService(client);
-      this.people = new PeopleService(client);
-      this.youtube = new YouTubeService(client);
-      this.slidesService = new SlidesService(client);
-      this.forms = new FormsService(client);
-      this.chat = new ChatService(client);
-      this.meet = new MeetService(client);
+      if (this.enabledServices.has("drive")) {
+        this.drive = new DriveService(client);
+      }
+      if (this.enabledServices.has("docs")) {
+        this.docs = new DocsService(client);
+      }
+      if (this.enabledServices.has("sheets")) {
+        this.sheets = new SheetsService(client);
+      }
+      if (this.enabledServices.has("tasks") || this.enabledServices.has("notes")) {
+        this.tasks = new TasksService(client);
+      }
+      if (this.enabledServices.has("calendar")) {
+        this.calendar = new CalendarService(client);
+      }
+      if (this.enabledServices.has("gmail")) {
+        this.gmail = new GmailService(client);
+      }
+      if (this.enabledServices.has("contacts")) {
+        this.people = new PeopleService(client);
+      }
+      if (this.enabledServices.has("youtube")) {
+        this.youtube = new YouTubeService(client);
+      }
+      if (this.enabledServices.has("slides")) {
+        this.slidesService = new SlidesService(client);
+      }
+      if (this.enabledServices.has("forms")) {
+        this.forms = new FormsService(client);
+      }
+      if (this.enabledServices.has("chat")) {
+        this.chat = new ChatService(client);
+      }
+      if (this.enabledServices.has("meet")) {
+        this.meet = new MeetService(client);
+      }
     }
   }
 
@@ -104,8 +131,7 @@ export class GoogleWorkspaceMCPServer {
   private setupHandlers(): void {
     // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: [
+      const tools = [
           // Authentication Tools
           {
             name: "google_auth",
@@ -1240,6 +1266,62 @@ export class GoogleWorkspaceMCPServer {
                 },
               },
               required: ["messageId"],
+            },
+          },
+          {
+            name: "gmail_list_drafts",
+            description: "List Gmail drafts with optional filtering.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                maxResults: {
+                  type: "number",
+                  description: "Maximum drafts to return (default: 20)",
+                },
+                q: {
+                  type: "string",
+                  description: "Gmail search query for drafts",
+                },
+                pageToken: {
+                  type: "string",
+                  description: "Token for pagination",
+                },
+              },
+              required: [],
+            },
+          },
+          {
+            name: "gmail_create_draft",
+            description: "Create a draft email.",
+            inputSchema: {
+              type: "object",
+              properties: {
+                to: {
+                  type: "string",
+                  description: "Recipient email address",
+                },
+                subject: {
+                  type: "string",
+                  description: "Email subject",
+                },
+                body: {
+                  type: "string",
+                  description: "Email body content",
+                },
+                cc: {
+                  type: "string",
+                  description: "CC recipients (comma-separated)",
+                },
+                bcc: {
+                  type: "string",
+                  description: "BCC recipients (comma-separated)",
+                },
+                isHtml: {
+                  type: "boolean",
+                  description: "Whether body is HTML (default: false)",
+                },
+              },
+              required: ["to", "subject", "body"],
             },
           },
           {
@@ -2719,7 +2801,10 @@ export class GoogleWorkspaceMCPServer {
               required: ["transcriptName"],
             },
           },
-        ],
+        ];
+
+      return {
+        tools: tools.filter((tool) => isToolEnabled(tool.name)),
       };
     });
 
@@ -2787,6 +2872,18 @@ export class GoogleWorkspaceMCPServer {
       const { name, arguments: args } = request.params;
 
       try {
+        if (!isToolEnabled(name)) {
+          return {
+            content: [
+              {
+                type: "text",
+                text: `Tool ${name} is not available (disabled or unknown).`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
         // Authentication tools don't require being authenticated
         if (name === "google_auth") {
           // First try to initialize (loads existing valid tokens)
@@ -3759,6 +3856,33 @@ export class GoogleWorkspaceMCPServer {
         if (name === "gmail_get_message") {
           const { messageId } = args as { messageId: string };
           const result = await this.gmail!.getMessage(messageId);
+          return {
+            content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+          };
+        }
+
+        if (name === "gmail_list_drafts") {
+          const { maxResults, q, pageToken } = args as {
+            maxResults?: number;
+            q?: string;
+            pageToken?: string;
+          };
+          const result = await this.gmail!.listDrafts({ maxResults, q, pageToken });
+          return {
+            content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+          };
+        }
+
+        if (name === "gmail_create_draft") {
+          const { to, subject, body, cc, bcc, isHtml } = args as {
+            to: string;
+            subject: string;
+            body: string;
+            cc?: string;
+            bcc?: string;
+            isHtml?: boolean;
+          };
+          const result = await this.gmail!.createDraft({ to, subject, body, cc, bcc, isHtml });
           return {
             content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
           };
