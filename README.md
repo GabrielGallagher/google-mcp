@@ -117,6 +117,23 @@ You can change enabled services and permissions using environment variables:
 
 When you change scopes, re-run `google_auth` (or `google_auth_code`) so the OAuth token matches the new scope set.
 
+## Quick Start Presets
+
+Read-only (no writes, no drafts):
+```
+GOOGLE_MCP_SCOPE_PROFILE=readonly
+GOOGLE_MCP_GMAIL_COMPOSE=false
+GOOGLE_MCP_GMAIL_MODIFY=false
+GOOGLE_MCP_GMAIL_SEND=false
+GOOGLE_MCP_CALENDAR_WRITE=false
+```
+
+Drafts only (no send/reply):
+```
+GOOGLE_MCP_SCOPE_PROFILE=editor
+GOOGLE_MCP_GMAIL_SEND=false
+```
+
 ## Google Cloud Setup
 
 Before using this server, you need to set up Google Cloud credentials:
