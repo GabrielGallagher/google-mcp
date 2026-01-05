@@ -111,8 +111,12 @@ function getDataDir(): string {
   return path.join(xdgData, APP_NAME);
 }
 
-// Credentials are configuration - use config directory
-const CREDENTIALS_PATH = path.join(getConfigDir(), "credentials.json");
+const CREDENTIALS_PATH_OVERRIDE = process.env.GOOGLE_MCP_CREDENTIALS_PATH?.trim();
+const CREDENTIALS_JSON_OVERRIDE = process.env.GOOGLE_MCP_CREDENTIALS_JSON?.trim();
+
+// Credentials are configuration - use config directory unless overridden
+const DEFAULT_CREDENTIALS_PATH = path.join(getConfigDir(), "credentials.json");
+const CREDENTIALS_PATH = CREDENTIALS_PATH_OVERRIDE || DEFAULT_CREDENTIALS_PATH;
 
 // Tokens are data - use data directory
 const TOKEN_PATH = path.join(getDataDir(), "tokens.json");
@@ -151,10 +155,10 @@ export class GoogleOAuth {
 
     try {
       // Ensure config directory exists (for credentials.json)
-      const configDir = getConfigDir();
-      if (!fs.existsSync(configDir)) {
-        fs.mkdirSync(configDir, { recursive: true, mode: 0o700 });
-        console.error(`Created config directory: ${configDir}`);
+      const credentialsDir = path.dirname(CREDENTIALS_PATH);
+      if (!fs.existsSync(credentialsDir)) {
+        fs.mkdirSync(credentialsDir, { recursive: true, mode: 0o700 });
+        console.error(`Created config directory: ${credentialsDir}`);
       }
 
       // Ensure data directory exists (for tokens.json)
@@ -177,7 +181,7 @@ export class GoogleOAuth {
    */
   public static getPaths(): { configDir: string; dataDir: string; credentialsPath: string; tokenPath: string } {
     return {
-      configDir: getConfigDir(),
+      configDir: path.dirname(CREDENTIALS_PATH),
       dataDir: getDataDir(),
       credentialsPath: CREDENTIALS_PATH,
       tokenPath: TOKEN_PATH,
@@ -186,6 +190,9 @@ export class GoogleOAuth {
 
   private loadCredentials(): CredentialsFile | null {
     try {
+      if (CREDENTIALS_JSON_OVERRIDE) {
+        return JSON.parse(CREDENTIALS_JSON_OVERRIDE) as CredentialsFile;
+      }
       if (fs.existsSync(CREDENTIALS_PATH)) {
         const content = fs.readFileSync(CREDENTIALS_PATH, "utf-8");
         return JSON.parse(content) as CredentialsFile;
@@ -224,6 +231,7 @@ export class GoogleOAuth {
       console.error(
         "You can download credentials from: https://console.cloud.google.com/apis/credentials"
       );
+      console.error("Alternatively, set GOOGLE_MCP_CREDENTIALS_PATH or GOOGLE_MCP_CREDENTIALS_JSON.");
       return false;
     }
 

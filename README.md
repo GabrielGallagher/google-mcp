@@ -184,6 +184,9 @@ Save the downloaded JSON file as `credentials.json` at the appropriate location 
 ```
 (typically `C:\Users\<username>\AppData\Roaming\google-mcp\credentials.json`)
 
+Alternatively, set `GOOGLE_MCP_CREDENTIALS_PATH` to point at a credentials file, or
+`GOOGLE_MCP_CREDENTIALS_JSON` to paste the JSON contents directly.
+
 The file should look like:
 ```json
 {
