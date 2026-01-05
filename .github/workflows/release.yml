@@ -1,0 +1,78 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+            arch: x86_64
+          - os: ubuntu-latest
+            platform: linux
+            arch: x86_64
+          - os: macos-13
+            platform: macos
+            arch: x86_64
+          - os: macos-14
+            platform: macos
+            arch: aarch64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Prune dev dependencies
+        run: npm prune --omit=dev
+
+      - name: Prepare artifact
+        run: npm run package:artifact
+
+      - name: Package (Windows)
+        if: matrix.os == 'windows-latest'
+        id: package_win
+        shell: pwsh
+        run: |
+          $artifact = "google-mcp-${{ matrix.platform }}-${{ matrix.arch }}.zip"
+          Compress-Archive -Path "artifact/google-mcp/*" -DestinationPath $artifact
+          "artifact=$artifact" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Package (Unix)
+        if: matrix.os != 'windows-latest'
+        id: package_unix
+        shell: bash
+        run: |
+          artifact="google-mcp-${{ matrix.platform }}-${{ matrix.arch }}.zip"
+          cd artifact/google-mcp
+          zip -r "../../$artifact" .
+          echo "artifact=$artifact" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package_win.outputs.artifact }}
+
+      - name: Upload release (Unix)
+        if: matrix.os != 'windows-latest'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package_unix.outputs.artifact }}
